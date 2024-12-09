@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe Local Test</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h1>チケット購入</h1>
+  <label for="ticket-quantity">チケット枚数を選択 (1～30枚):</label>
+  <select id="ticket-quantity"></select>
+  <p id="bonus-info">おまけ: 0枚</p>
+  <p id="total-info">合計枚数: 1枚</p>
+  <button id="checkout-button">購入する</button>
+
+  <script>
+    let stripe;
+
+    // Stripe公開キーをバックエンドから取得
+    async function initializeStripe() {
+      const response = await fetch('/config');
+      const { publishableKey } = await response.json();
+      stripe = Stripe(publishableKey);
+    }
+
+    initializeStripe();
+
+    // 選択肢を動的に生成
+    const ticketQuantitySelect = document.getElementById('ticket-quantity');
+    for (let i = 1; i <= 30; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `${i}枚`;
+      ticketQuantitySelect.appendChild(option);
+    }
+
+    // 合計とおまけ情報を更新
+    ticketQuantitySelect.addEventListener('change', (e) => {
+      const quantity = parseInt(e.target.value, 10);
+      let bonus = 0;
+
+      if (quantity >= 10 && quantity < 20) {
+        bonus = 1;
+      } else if (quantity >= 20) {
+        bonus = 2;
+      }
+
+      document.getElementById('bonus-info').textContent = `おまけ: ${bonus}枚`;
+      document.getElementById('total-info').textContent = `合計枚数: ${quantity + bonus}枚`;
+    });
+
+    // 購入ボタンのクリックイベント
+    document.getElementById('checkout-button').addEventListener('click', async () => {
+      const quantity = parseInt(ticketQuantitySelect.value, 10);
+
+      // サーバーに購入リクエストを送信
+      const response = await fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity }),
+      });
+
+      // Stripe Checkoutにリダイレクト
+      const { id } = await response.json();
+      stripe.redirectToCheckout({ sessionId: id });
+    });
+  </script>
+</body>
+</html>
