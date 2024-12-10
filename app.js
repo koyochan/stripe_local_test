@@ -4,20 +4,16 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const admin = require('firebase-admin');
 const path = require('path');
 
-// Firebase 初期化
-const serviceAccount = require('./tenxer-education-firebase-adminsdk-26dqu-bb9f77bf64.json'); // サービスアカウントキーのパス
+const serviceAccount = require('./tenxer-education-firebase-adminsdk-26dqu-bb9f77bf64.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const db = admin.firestore();
 
-// アプリケーション作成
 const app = express();
 
-// 静的ファイルを提供
 app.use(express.static(path.join(__dirname, 'public')));
 
-// グローバルミドルウェア: Webhook エンドポイントを除外
 app.use((req, res, next) => {
   if (req.originalUrl === '/webhook') {
     next();
@@ -26,7 +22,6 @@ app.use((req, res, next) => {
   }
 });
 
-// 公開キーを提供するエンドポイント
 app.get('/config', (req, res) => {
   res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
 });
@@ -43,7 +38,6 @@ app.get('/success', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'success.html'));
 });
 
-// Checkoutセッション作成エンドポイント
 app.post('/create-checkout-session', async (req, res) => {
   const { quantity, userId } = req.body;
 
@@ -55,29 +49,26 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 
   try {
-    // 購入チケットの line_item
     const lineItems = [
       {
-        price: 'price_1QU6uiLq3OLnMuJlFnyl4uLM', // 有料チケットのPrice ID
+        price: 'price_1QU6uiLq3OLnMuJlFnyl4uLM',
         quantity: quantity,
       },
     ];
 
-    // ボーナスチケットを追加 (無料)
     if (bonus > 0) {
       lineItems.push({
         price_data: {
-          currency: 'jpy', // 通貨
+          currency: 'jpy',
           product_data: {
-            name: 'おまけチケット', // 商品名
+            name: 'おまけチケット', 
           },
-          unit_amount: 0, // 価格 (0円)
+          unit_amount: 0,
         },
-        quantity: bonus, // ボーナスチケットの枚数
+        quantity: bonus,
       });
     }
 
-    // Checkout セッションを作成
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -97,21 +88,18 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// Webhook エンドポイント (raw ミドルウェアを適用)
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
   const sig = req.headers['stripe-signature'];
 
   let event;
   try {
-    // Webhook シグネチャの検証
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // checkout.session.completed イベントを処理
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
 
@@ -128,7 +116,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
         return res.status(404).send(`User with ID ${userId} not found.`);
       }
 
-      // tickets フィールドを更新
       await userRef.update({
         tickets: admin.firestore.FieldValue.increment(quantity + bonus),
       });
@@ -145,5 +132,4 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 });
 
-// サーバー用アプリをエクスポート
 module.exports = app;

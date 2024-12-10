@@ -17,7 +17,6 @@
   <script>
     let stripe;
 
-    // Stripe公開キーをバックエンドから取得
     async function initializeStripe() {
       const response = await fetch('/config');
       const { publishableKey } = await response.json();
@@ -26,10 +25,8 @@
 
     initializeStripe();
 
-    // ユーザーIDの設定 (ここでは仮のIDを設定。実際には認証情報などから取得するべき)
-    const userId = 'kota'; // 仮のユーザーID
+    const userId = 'kota';
 
-    // 選択肢を動的に生成
     const ticketQuantitySelect = document.getElementById('ticket-quantity');
     for (let i = 1; i <= 30; i++) {
       const option = document.createElement('option');
@@ -38,7 +35,6 @@
       ticketQuantitySelect.appendChild(option);
     }
 
-    // 合計とおまけ情報を更新
     ticketQuantitySelect.addEventListener('change', (e) => {
       const quantity = parseInt(e.target.value, 10);
       let bonus = 0;
@@ -53,18 +49,15 @@
       document.getElementById('total-info').textContent = `合計枚数: ${quantity + bonus}枚`;
     });
 
-    // 購入ボタンのクリックイベント
     document.getElementById('checkout-button').addEventListener('click', async () => {
       const quantity = parseInt(ticketQuantitySelect.value, 10);
 
-      // サーバーに購入リクエストを送信
       const response = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity, userId }), // userId を追加
+        body: JSON.stringify({ quantity, userId }),
       });
 
-      // Stripe Checkoutにリダイレクト
       const { id } = await response.json();
       stripe.redirectToCheckout({ sessionId: id });
     });
