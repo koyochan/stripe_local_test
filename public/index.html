@@ -26,6 +26,9 @@
 
     initializeStripe();
 
+    // ユーザーIDの設定 (ここでは仮のIDを設定。実際には認証情報などから取得するべき)
+    const userId = 'kota'; // 仮のユーザーID
+
     // 選択肢を動的に生成
     const ticketQuantitySelect = document.getElementById('ticket-quantity');
     for (let i = 1; i <= 30; i++) {
@@ -58,7 +61,7 @@
       const response = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({ quantity, userId }), // userId を追加
       });
 
       // Stripe Checkoutにリダイレクト
