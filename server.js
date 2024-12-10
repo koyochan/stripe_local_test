@@ -66,6 +66,16 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
+// /successエンドポイントを設定
+app.get('/success', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'success.html'));
+});
+
+// /cancelエンドポイントを設定
+app.get('/cancel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cancel.html'));
+});
+
 // サーバー起動
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
