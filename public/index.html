@@ -1,23 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stripe Local Test</title>
   <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #ebf8ff, #c3dafe);
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #2d3748;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-size: 16px;
+      color: #4a5568;
+    }
+
+    select {
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    p {
+      margin-top: 12px;
+      font-size: 16px;
+      color: #718096;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #3182ce;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2c5282;
+    }
+  </style>
 </head>
 <body>
-  <h1>チケット購入</h1>
-  <label for="ticket-quantity">チケット枚数を選択 (1～30枚):</label>
-  <select id="ticket-quantity"></select>
-  <p id="bonus-info">おまけ: 0枚</p>
-  <p id="total-info">合計枚数: 1枚</p>
-  <button id="checkout-button">購入する</button>
+  <div class="container">
+    <h1>チケット購入</h1>
+    <label for="ticket-quantity">チケット枚数を選択 (1～30枚):</label>
+    <select id="ticket-quantity"></select>
+    <p id="bonus-info">おまけ: 0枚</p>
+    <p id="total-info">合計枚数: 1枚</p>
+    <div class="button-container">
+      <button id="checkout-button">購入する</button>
+    </div>
+  </div>
 
   <script>
     let stripe;
 
-    // Stripe公開キーをバックエンドから取得
     async function initializeStripe() {
       const response = await fetch('/config');
       const { publishableKey } = await response.json();
@@ -26,7 +97,8 @@
 
     initializeStripe();
 
-    // 選択肢を動的に生成
+    const userId = 'kota';
+
     const ticketQuantitySelect = document.getElementById('ticket-quantity');
     for (let i = 1; i <= 30; i++) {
       const option = document.createElement('option');
@@ -35,7 +107,6 @@
       ticketQuantitySelect.appendChild(option);
     }
 
-    // 合計とおまけ情報を更新
     ticketQuantitySelect.addEventListener('change', (e) => {
       const quantity = parseInt(e.target.value, 10);
       let bonus = 0;
@@ -50,18 +121,15 @@
       document.getElementById('total-info').textContent = `合計枚数: ${quantity + bonus}枚`;
     });
 
-    // 購入ボタンのクリックイベント
     document.getElementById('checkout-button').addEventListener('click', async () => {
       const quantity = parseInt(ticketQuantitySelect.value, 10);
 
-      // サーバーに購入リクエストを送信
       const response = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({ quantity, userId }),
       });
 
-      // Stripe Checkoutにリダイレクト
       const { id } = await response.json();
       stripe.redirectToCheckout({ sessionId: id });
     });
