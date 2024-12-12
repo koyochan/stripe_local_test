@@ -62,27 +62,27 @@
 │   └── success.html
 └── server.js
 ```
-# 🚀 必要なコマンド一覧と設定方法
+## 🚀 必要なコマンド一覧と設定方法
 
-## 1. Stripeにログイン
+1. **Stripeにログイン**
 ```stripe login```
 
-## 2. サーバーを起動
+2. **サーバーを起動**
 ```node server.js```
 
-## 3. StripeのWebhookをローカルサーバーに転送
+3. **StripeのWebhookをローカルサーバーに転送**
 ```stripe listen --forward-to http://localhost:4242/webhook```
 
-## 4. Stripeのプロダクト一覧を確認
+4. **Stripeのプロダクト一覧を確認**
 ```stripe products list```
 
-## 5. Stripeの価格一覧を確認
+5. **Stripeの価格一覧を確認**
 ```stripe prices list```
 
 ---
 
-# ⚙️ 環境変数の設定 (`.env` ファイル)
-## 以下の内容を `.env` ファイルに記述してください。
+## ⚙️ 環境変数の設定 (`.env` ファイル)
+以下の内容を `.env` ファイルに記述してください。
 ```
 STRIPE_PUBLISHABLE_KEY=pk_test_*****************************
 STRIPE_SECRET_KEY=sk_test_*****************************
