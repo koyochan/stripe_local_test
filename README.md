@@ -91,30 +91,51 @@ STRIPE_SECRET_KEY=sk_test_*****************************
 STRIPE_ENDPOINT_SECRET=whsec_*****************************
 ```
 
-💻 実行画面
+## 💻 実行画面
 
-購入画面
+以下はアプリケーションの実行画面です。各フローに応じた画面のスクリーンショットを掲載しています。
 
-<img width="1468" alt="購入画面" src="https://github.com/user-attachments/assets/e783be15-6e42-461e-99fa-767fb299695f" />
+---
 
+### 🛒 購入画面
+ユーザーが商品を選択し、購入を開始する画面です。
 
-決済画面 (Checkout画面)
+<div align="center">
+  <img width="800" alt="購入画面" src="https://github.com/user-attachments/assets/e783be15-6e42-461e-99fa-767fb299695f" />
+</div>
 
-<img width="1468" alt="決済画面" src="https://github.com/user-attachments/assets/b76cad65-dda9-4485-b406-4ddb674d50bb" />
+---
 
+### 💳 決済画面 (Checkout画面)
+Stripe Checkoutを利用した決済画面です。
 
-決済成功画面 (Success画面)
+<div align="center">
+  <img width="800" alt="決済画面" src="https://github.com/user-attachments/assets/b76cad65-dda9-4485-b406-4ddb674d50bb" />
+</div>
 
-<img width="1468" alt="決済成功画面" src="https://github.com/user-attachments/assets/ec395d70-a0cb-4087-a741-99f65836acaf" />
+---
 
+### ✅ 決済成功画面 (Success画面)
+決済が成功した場合に表示される画面です。
 
-決済失敗/キャンセル画面 (Cancel画面)
+<div align="center">
+  <img width="800" alt="決済成功画面" src="https://github.com/user-attachments/assets/ec395d70-a0cb-4087-a741-99f65836acaf" />
+</div>
 
-<img width="1469" alt="決済キャンセル画面" src="https://github.com/user-attachments/assets/9cf13919-2dfa-40f5-92f8-84ec1423f431" />
+---
 
+### ❌ 決済失敗/キャンセル画面 (Cancel画面)
+決済が失敗、またはキャンセルされた場合に表示される画面です。
 
-Firestore画面
+<div align="center">
+  <img width="800" alt="決済キャンセル画面" src="https://github.com/user-attachments/assets/9cf13919-2dfa-40f5-92f8-84ec1423f431" />
+</div>
 
-<img width="1117" alt="Firestore画面" src="https://github.com/user-attachments/assets/c87be83c-ce41-49b4-8773-27f93a1c8efb" />
-```
+---
 
+### 📂 Firestore画面
+Firestoreで管理されるデータの様子を示しています。
+
+<div align="center">
+  <img width="800" alt="Firestore画面" src="https://github.com/user-attachments/assets/c87be83c-ce41-49b4-8773-27f93a1c8efb" />
+</div>
