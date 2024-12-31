@@ -4,7 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const admin = require('firebase-admin');
 const path = require('path');
 
-const serviceAccount = require('./tenxer-education-firebase-adminsdk-26dqu-bb9f77bf64.json');
+const serviceAccount = require('./firebase_service_key.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -39,35 +39,19 @@ app.get('/success', (req, res) => {
 });
 
 app.post('/create-checkout-session', async (req, res) => {
-  const { quantity, userId } = req.body;
-
-  let bonus = 0;
-  if (quantity >= 10 && quantity < 20) {
-    bonus = 1;
-  } else if (quantity >= 20) {
-    bonus = 2;
-  }
-
   try {
+    const { quantity, userId } = req.body;
+
+    console.log('Environment Variables:', process.env.STRIPE_SECRET_KEY, process.env.STRIPE_ENDPOINT_SECRET);
+    console.log('Received quantity:', quantity);
+    console.log('Received userId:', userId);
+
     const lineItems = [
       {
-        price: 'price_1QU6uiLq3OLnMuJlFnyl4uLM',
+        price: 'price_1QbyT5B9Kt3qFW4Su67dTnCK',
         quantity: quantity,
       },
     ];
-
-    if (bonus > 0) {
-      lineItems.push({
-        price_data: {
-          currency: 'jpy',
-          product_data: {
-            name: 'おまけチケット', 
-          },
-          unit_amount: 0,
-        },
-        quantity: bonus,
-      });
-    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -78,13 +62,15 @@ app.post('/create-checkout-session', async (req, res) => {
       metadata: {
         userId,
         quantity,
-        bonus,
       },
     });
 
+    console.log('Created session:', session.id);
+
     res.json({ id: session.id });
   } catch (error) {
-    res.status(400).send({ error: { message: error.message } });
+    console.error('Error creating checkout session:', error);
+    res.status(400).json({ error: error.message });
   }
 });
 
